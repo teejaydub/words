@@ -91,6 +91,7 @@ def search_regexes(regexes):
 def main():
   # Setup
   import argparse
+  import readline
 
   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                    description='Search for words that match various constraints.',
