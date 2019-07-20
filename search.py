@@ -46,18 +46,21 @@ class WordSet(UserList):
       makes documentation clearer to have this list defined as a concept!)
 
       >>> WordSet(matches("s==m"))
-      ['spam', 'swim']
+      spam, swim
   """
   def __repr__(self):
     """Format nicely for display, as a list of matching words."""
-    return str([match[0] for match in self])
+    return ', '.join([match[0] for match in self])
+
+  def __str__(self):
+    return repr(self)
 
 def match_word_sets(regex):
   """ Like matches(), but return an iterator that returns WordSets,
       rather than single re.Matches.
 
       >>> list(match_word_sets("s==m"))
-      [['spam'], ['swim']]
+      [spam, swim]
   """
   return map(lambda m: WordSet([m]), matches(regex))
 
@@ -80,19 +83,20 @@ def cross_match(wordsets, regex):
       yield wordset + [match]
 
 def search_regexes(regexes):
-    """ Returns a list of WordSets that match all the regexes in the given list. 
+    """ Returns an iterable of WordSets that match all the regexes in the given list. 
 
-        >>> search_regexes(["=gg=", "2p=="])
-        [['eggs', 'spam']]
+        >>> list(search_regexes(["=gg=", "2p=="]))
+        [eggs, spam]
     """
     all_matches = match_word_sets(regexes[0])
     for r in regexes[1:]:
       all_matches = cross_match(all_matches, r)
-    return list(all_matches)
+    return all_matches
 
 def main():
   # Setup
   import argparse
+
   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                    description='Search for words that match various constraints.',
                                    epilog="""
@@ -122,7 +126,8 @@ rules to make it easier to type word searches:
   load_dict(args.dictfile)
 
   # Report the matches.
-  print("Matches:", search_regexes(args.regexes))
+  for wordset in search_regexes(args.regexes):
+    print(wordset)
 
 def test():
     import doctest

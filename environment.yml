@@ -1,0 +1,4 @@
+name: words
+dependencies:
+- python=3
+
