@@ -3,12 +3,9 @@ import argparse
 import re
 
 # To do:
-#  replace -
-#  replace ~
 #  chain endlessly - first argument to cross_match should be the cumulative results so far,
 #    and the groups are taken from the last item in each tuple?
 #  test the last example, using '*'
-#  pull examples out into a separate --help --verbose argument, or --examples, or just the README?
 
 # Setup
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -27,31 +24,6 @@ rules to make it easier to type word searches:
   Each tilde is converted into a group of any single character: ~ becomes (.)
 
   Sequences of equals are converted into a group of dots: === becomes (...)
-
-Example arguments:
-
-  "(...)RI(..)" 1AN2
-
-shows all pairs of 7-letter words that have the same three-letter prefix and
-two-letter suffix, with "RI" between them in the first word and "AN" between
-them in the second word.
-
-  ===ri== 1an2
-
-does the same.
-
-  ===ri~~ 1an23 3w==
-
-does the same, and also requires the last letter of both the first and second
-words to be the first letter of the third, which then has a 'd' and two more
-letters.
-
-  ==ri~~ 2ef* 1ie
-
-shows six-letter words with 'ri' in the middle, where the second-to-last
-letter starts the next word, which then has 'ef' and anything else of any
-length, and the third word starts with the same letter as the second, followed
-by 'ie'. 
 """)
 parser.add_argument('regexes', metavar='R', nargs='+',
                     help="""A regular expression to use for searching.  Case-insensitive.
