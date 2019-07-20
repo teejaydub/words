@@ -1,10 +1,5 @@
 #! /usr/bin/python3
 
-# To do:
-#  chain endlessly - first argument to cross_match should be the cumulative results so far,
-#    and the groups are taken from the last item in each tuple?
-#  test the last example, using '*'
-
 from collections import UserList
 import re
 
@@ -100,6 +95,8 @@ def main():
   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                    description='Search for words that match various constraints.',
                                    epilog="""
+If no regular expressions are listed, you can enter them interactively at the prompt.
+
 Regular expressions follow the standard Python regex rules, with these
 rules to make it easier to type word searches:
 
@@ -113,8 +110,10 @@ rules to make it easier to type word searches:
   Each tilde is converted into a group of any single character: ~ becomes (.)
 
   Sequences of equals are converted into a group of dots: === becomes (...)
+
+  Example: A=LE 1AK=~ c=wa3=  gives ABLE, BAKER, COWARD
 """)
-  parser.add_argument('regexes', metavar='R', nargs='+',
+  parser.add_argument('regexes', metavar='R', nargs='*',
                       help="""A regular expression to use for searching.  Case-insensitive.
                         Use digit n to interpolate the n-th group from the previous regex.""")
   parser.add_argument('--dict', dest='dictfile', default='dic.txt',
@@ -125,9 +124,30 @@ rules to make it easier to type word searches:
 
   load_dict(args.dictfile)
 
-  # Report the matches.
-  for wordset in search_regexes(args.regexes):
-    print(wordset)
+  def print_results(results):
+    hadSome = False
+    for wordset in results:
+      print(wordset)
+      hadSome = True
+    if not hadSome:
+      print("No matches.")
+    print("")
+
+  if len(args.regexes):
+    # Report the matches from command-line arguments.
+    print_results(search_regexes(args.regexes))
+  else:
+    # Prompt for input.
+    print("Interactive mode.  Type ? for help, blank line to end.")
+    while True:
+      line = input("Regular expressions: ").strip()
+      if line == '':
+        exit(0)
+      if line == '?':
+        print(parser.epilog)
+      else:
+        regexes = line.split(' ')
+        print_results(search_regexes(regexes))
 
 def test():
     import doctest

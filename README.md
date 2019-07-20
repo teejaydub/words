@@ -32,27 +32,31 @@ expression, though `grep` is probably already on your system for that.)
 
 Run `python search.py -h` to see command line usage.
 
-Example usage:
+Example arguments:
 
-  `python search.py "(...)RI(..)" 1AN2`
+  `(...)RI(..) 1AN2`
 
 shows all pairs of 7-letter words that have the same three-letter prefix and
 two-letter suffix, with "RI" between them in the first word and "AN" between
 them in the second word.
 
-  `python search.py ===ri== 1an2`
+  `===ri== 1an2`
 
 does the same.
 
-  `python search.py ===ri~~ 1an23 3w=m`
+  `===ri~~ 1an23 3w=m`
 
 does the same, and also requires the last letter of both the first and second
 words to be the first letter of the third, which then has a 'd' and two more
 letters.
 
-  `python search.py ==ri~~ 2ef* 1ie`
+  `==ri~~ 2ef* 1ie`
 
 shows six-letter words with 'ri' in the middle, where the second-to-last
 letter starts the next word, which then has 'ef' and anything else of any
 length, and the third word starts with the same letter as the second, followed
 by 'ie'. 
+
+  `A=LE 1AK=~ c=wa3=`
+
+gives ABLE, BAKER, COWARD.
