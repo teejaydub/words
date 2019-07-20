@@ -69,11 +69,14 @@ def cross_match(wordsets, regex):
   for wordset in wordsets:
     # Substitute all groups from the last match into regex.
     lastmatch = wordset[-1]
+    rs = regex  # the regex with group substitutions
     for i in range(1, lastmatch.lastindex + 1):
-      regex = re.sub(str(i), '(' + lastmatch[i] + ')', regex)
+      rs = re.sub(str(i), '(' + lastmatch[i] + ')', rs)
+    # print("cross_match: rs =", rs)
 
     # Now match the resulting regex over the words, add matches to a new WordSet, and list them.
-    for match in matches(regex):
+    for match in matches(rs):
+      # print("cross_match: adding", match, "to", wordset)
       yield wordset + [match]
 
 def search_regexes(regexes):
