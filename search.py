@@ -5,7 +5,15 @@
 #    and the groups are taken from the last item in each tuple?
 #  test the last example, using '*'
 
+from collections import UserList
 import re
+
+# The dictionary of words.
+# Initialize to a trivial dictionary for use in testing.
+words = """eggs
+spam
+swim
+"""
 
 def load_dict(dictfile="dic.txt"):
   global words
@@ -19,32 +27,44 @@ def matches(regex):
   """ Return an iterator that matches the given string as a regex over all the words,
       using the substitutions we're making here.
       The iterator returns re.Matches.
+
+      >>> matches("s==m")  #doctest: +ELLIPSIS
+      <callable_iterator object at ...>
+      >>> list(matches("s==m"))
+      [<re.Match object; span=(5, 9), match='spam'>, <re.Match object; span=(10, 14), match='swim'>]
   """
   regex = re.sub('~', '(.)', regex)
   regex = re.sub('(=+)', lambda x: '(' + len(x[0]) * '.' + ')', regex)
   return re.finditer("^" + regex + "$", words, re.IGNORECASE | re.MULTILINE)
 
-class WordSet(list):
+class WordSet(UserList):
   """ A list of words that match the given constraints.
-      Contains as many elements as we have matched constraints so far.
       Each element is a re.Match.
+      Contains as many elements as we have matched constraints so far.
+
+      (This class mainly exists to make it easy to print, but it also
+      makes documentation clearer to have this list defined as a concept!)
+
+      >>> WordSet(matches("s==m"))
+      ['spam', 'swim']
   """
-  def __str__(self):
+  def __repr__(self):
     """Format nicely for display, as a list of matching words."""
-    # return [match[0] for match in self]
-    return "a WordSet"
+    return str([match[0] for match in self])
 
 def match_word_sets(regex):
   """ Like matches(), but return an iterator that returns WordSets,
       rather than single re.Matches.
+
+      >>> list(match_word_sets("s==m"))
+      [['spam'], ['swim']]
   """
   return map(lambda m: WordSet([m]), matches(regex))
 
 def cross_match(wordsets, regex):
   """ Given an iterable of WordSets from preceding searches,
-      generates WordSets, adding matches
-      for the given new regex, evaluated with each WordSet's last match's groups
-      substituted for single-digit integers.
+      generates new WordSets, adding matches for the given new regex, 
+      evaluated with each WordSet's last match's groups substituted for single-digit integers.
   """
   for wordset in wordsets:
     # Substitute all groups from the last match into regex.
@@ -54,7 +74,18 @@ def cross_match(wordsets, regex):
 
     # Now match the resulting regex over the words, add matches to a new WordSet, and list them.
     for match in matches(regex):
-       yield wordset + match
+      yield wordset + [match]
+
+def search_regexes(regexes):
+    """ Returns a list of WordSets that match all the regexes in the given list. 
+
+        >>> search_regexes(["=gg=", "2p=="])
+        [['eggs', 'spam']]
+    """
+    all_matches = match_word_sets(regexes[0])
+    for r in regexes[1:]:
+      all_matches = cross_match(all_matches, r)
+    return list(all_matches)
 
 def main():
   # Setup
@@ -62,37 +93,41 @@ def main():
   parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                    description='Search for words that match various constraints.',
                                    epilog="""
-  Regular expressions follow the standard Python regex rules, with these
-  rules to make it easier to type word searches:
+Regular expressions follow the standard Python regex rules, with these
+rules to make it easier to type word searches:
 
-    Use parentheses to mark groups as usual.
+  Use parentheses to mark groups as usual.
 
-    Groups will be available to the following regex using a bare digit, 1-9.
+  Groups will be available to the following regex using a bare digit, 1-9.
 
-    Bare digit references will each become groups for the following regex,
-    renumbered in the order they appear.
+  Bare digit references will each become groups for the following regex,
+  renumbered in the order they appear.
 
-    Each tilde is converted into a group of any single character: ~ becomes (.)
+  Each tilde is converted into a group of any single character: ~ becomes (.)
 
-    Sequences of equals are converted into a group of dots: === becomes (...)
-  """)
+  Sequences of equals are converted into a group of dots: === becomes (...)
+""")
   parser.add_argument('regexes', metavar='R', nargs='+',
                       help="""A regular expression to use for searching.  Case-insensitive.
                         Use digit n to interpolate the n-th group from the previous regex.""")
   parser.add_argument('--dict', dest='dictfile', default='dic.txt',
                       help='File with words, one per line (default: dic.txt)')
+  parser.add_argument('--test', action='store_true', help='Run unit tests (only).')
 
   args = parser.parse_args()
 
   load_dict(args.dictfile)
 
-  # Do the intersection: run each subsequent search with the substitutions from the previous searches.
-  all_matches = match_word_sets(args.regexes[0])
-  print("First matches:", list(all_matches))
-  for r in args.regexes[1:]:
-    all_matches = cross_match(all_matches, r)
-
   # Report the matches.
-  print("Matches:", list(all_matches))
+  print("Matches:", search_regexes(args.regexes))
 
-if __name__ == "__main__": main()
+def test():
+    import doctest
+    doctest.testmod()
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) >= 2 and sys.argv[1] == '--test':
+        test()
+    else:
+        main()
