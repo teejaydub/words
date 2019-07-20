@@ -69,7 +69,8 @@ def cross_match(wordsets, regex):
     lastmatch = wordset[-1]
     rs = regex  # the regex with group substitutions
     for i in range(1, lastmatch.lastindex + 1):
-      rs = re.sub(str(i), '(' + lastmatch[i] + ')', rs)
+      rs = re.sub('(?<!\\\\)'  # that's "not preceded by a backslash" - so you can use normal substitutions
+        + str(i), '(' + lastmatch[i] + ')', rs)
     # print("cross_match: rs =", rs)
 
     # Now match the resulting regex over the words, add matches to a new WordSet, and list them.

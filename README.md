@@ -42,20 +42,20 @@ them in the second word.
 
   `===ri== 1an2`
 
-does the same.
+does the same.  That is, '=' is like '.' but forms a group of consecutive letters.
 
   `===ri~~ 1an23 3w=m`
 
 does the same, and also requires the last letter of both the first and second
-words to be the first letter of the third, which then has a 'd' and two more
-letters.
+words to be the first letter of the third, which then has a 'w' and two more
+letters, the last of which is 'm'.
 
-  `==ri~~ 2ef* 1ie`
+  `==ri~~ 2e(.)\2[aeiou]+ 1ie`
 
 shows six-letter words with 'ri' in the middle, where the second-to-last
-letter starts the next word, which then has 'ef' and anything else of any
-length, and the third word starts with the same letter as the second, followed
-by 'ie'. 
+letter starts the next word, which then has 'e', two doubled letters, and 
+then one or more vowels, and the third word starts with the same letter as the second, followed
+by 'ie'.  This illustarates that you can use any regular expression features.
 
   `A=LE 1AK=~ c=wa3=`
 
