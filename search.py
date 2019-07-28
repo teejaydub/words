@@ -118,8 +118,8 @@ rules to make it easier to type word searches:
   parser.add_argument('regexes', metavar='R', nargs='*',
                       help="""A regular expression to use for searching.  Case-insensitive.
                         Use digit n to interpolate the n-th group from the previous regex.""")
-  parser.add_argument('--dict', dest='dictfile', default='dic.txt',
-                      help='File with words, one per line (default: dic.txt)')
+  parser.add_argument('--dict', dest='dictfile', default='words.txt',
+                      help='File with words, one per line (default: words.txt)')
   parser.add_argument('--test', action='store_true', help='Run unit tests (only).')
 
   args = parser.parse_args()
