@@ -70,6 +70,7 @@ def cross_match(wordsets, regex):
     rs = regex  # the regex with group substitutions
     for i in range(1, lastmatch.lastindex + 1):
       rs = re.sub('(?<!\\\\)'  # that's "not preceded by a backslash" - so you can use normal substitutions
+        + '(?<!(\\{|,))'  # and not preceded by brace or comma, so you can use {5,7} etc.
         + str(i), '(' + lastmatch[i] + ')', rs)
     # print("cross_match: rs =", rs)
 
