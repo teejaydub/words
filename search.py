@@ -153,12 +153,12 @@ rules to make it easier to type word searches:
         print_results(search_regexes(regexes))
 
 def test():
-    import doctest
-    doctest.testmod()
+  import doctest
+  doctest.testmod()
 
 if __name__ == "__main__":
-    import sys
-    if len(sys.argv) >= 2 and sys.argv[1] == '--test':
-        test()
-    else:
-        main()
+  import sys
+  if len(sys.argv) >= 2 and sys.argv[1] == '--test':
+    test()
+  else:
+    main()
