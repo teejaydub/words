@@ -1,8 +1,8 @@
 run:
-	python search.py
+	pipenv run ./search.py
 
 test:
-	python search.py --test
+	pipenv run ./search.py --test
 
 depends:
 	pip install --user pipenv
